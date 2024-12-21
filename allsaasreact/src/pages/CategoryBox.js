@@ -1,6 +1,5 @@
-// src/components/CategoryBox.js
 import React from 'react';
-import './CategoryBox.css';
+import { Star } from 'lucide-react';
 
 const CategoryBox = ({ site }) => {
   // 예시 데이터 구조
@@ -20,34 +19,36 @@ const CategoryBox = ({ site }) => {
   };
 
   return (
-    <div className="category-box">
-      <div className="box-left">
-        <div className="site-info">
-          <img src={siteData.logo} alt={siteData.name} className="site-logo" />
-          <div className="site-title">
-            <h3>{siteData.name}</h3>
-            <div className="rating">
-              {'★'.repeat(Math.floor(siteData.rating))}
-              {siteData.rating % 1 !== 0 && '☆'}
-              <span className="review-count">({siteData.reviewCount})</span>
-              <div className="rating-number">{siteData.rating}</div>
+    <div className="flex bg-[#F0FFF0] border border-gray-200 rounded-lg p-5 h-[600px] gap-5 cursor-pointer transition-all duration-200 hover:translate-y-[-4px] hover:shadow-lg">
+      {/* 왼쪽 섹션 */}
+      <div className="flex-1 flex flex-col gap-5">
+        <div className="flex items-start gap-3">
+          <img src={siteData.logo} alt={siteData.name} className="w-[50px] h-[50px] object-contain" />
+          <div className="flex flex-col gap-1">
+            <h3 className="text-lg font-semibold m-0">{siteData.name}</h3>
+            <div className="flex items-center gap-1">
+              <div className="flex text-yellow-400">
+                {'★'.repeat(Math.floor(siteData.rating))}
+                {siteData.rating % 1 !== 0 && '☆'}
+              </div>
+              <span className="text-gray-500 text-sm">({siteData.reviewCount})</span>
+              <div className="text-gray-900 font-semibold ml-1">{siteData.rating}</div>
             </div>
           </div>
         </div>
-        <div className="site-description">
-          <p>{siteData.description}</p>
-        </div>
+        <p className="text-sm text-gray-600">{siteData.description}</p>
       </div>
-      
-      <div className="box-right">
-        <div className="video-section">
+
+      {/* 오른쪽 섹션 */}
+      <div className="flex-1 flex flex-col gap-5">
+        <div className="h-[150px] bg-gray-100 rounded flex items-center justify-center">
           <div className="video-placeholder">
             유튜브 영상넣기
           </div>
         </div>
-        <div className="user-review">
-          <h4>{siteData.userReview.title}</h4>
-          <p>{siteData.userReview.content}</p>
+        <div className="bg-gray-50 p-3 rounded">
+          <h4 className="text-base text-gray-900 font-medium mb-2">{siteData.userReview.title}</h4>
+          <p className="text-sm text-gray-600 leading-relaxed">{siteData.userReview.content}</p>
         </div>
       </div>
     </div>
