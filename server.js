@@ -1,7 +1,13 @@
 const express = require('express');
+require('dotenv').config();
 const app = express();
 const port = 8080;
 const cors = require('cors');
+const initializeDB = require("./routes/db.js");
+const saasRouter = require('./routes/uploadSaas')
+const reviewRouter = require('./routes/addReview.js');
+const crawler = require('./routes/crawler.js');
+
 
 // 미들웨어 설정
 app.use(cors());
@@ -16,25 +22,62 @@ app.get('/', (req, res) => {
     res.send('환영합니다! Express 서버입니다.');
 });
 
-// GET 요청 예시
-app.get('/api/users', (req, res) => {
-    // 예시 데이터
-    const users = [
-        { id: 1, name: '홍길동' },
-        { id: 2, name: '김철수' }
-    ];
-    res.json(users);
+// 이미지처리 라우트
+app.use('/addsaas', saasRouter);
+
+// 로고찾기 라우트
+app.use('/api', crawler);
+
+
+// Category에서 categorybox 안에 내용채우기
+app.get('/api/sites', async (req, res) => {
+    try {
+        const db = await initializeDB();
+        const sites = await db.collection('appinfo').find().toArray(); 
+        const reviews = await db.collection('reviews').find().toArray(); 
+        console.log(reviews[0])
+        res.json({ sites, reviews });
+        
+        
+      
+    } catch (error) {
+        console.error('Error fetching app data:', error);
+        res.status(500).json({ message: "서버 에러가 발생했습니다" });
+    }
 });
 
-// POST 요청 예시
-app.post('/api/users', (req, res) => {
-    const newUser = req.body;
-    // 여기서 데이터베이스에 저장하는 로직이 들어갈 수 있습니다
-    res.status(201).json({
-        message: '사용자가 생성되었습니다',
-        user: newUser
-    });
+// appinfo 안에 내용들 get요청 처리
+app.get('/appinfo/:name', async (req, res) => {
+    try {
+        const db = await initializeDB();  // 이 줄 추가
+        console.log('요청된 이름:', req.params.name);
+        
+        const result = await db.collection('appinfo').findOne({ 
+            name: req.params.name
+        });
+
+        const reviews = await db.collection('reviews').find({ 
+            name: req.params.name
+        }).toArray();
+
+
+
+        console.log(result)
+        console.log(reviews) 
+        
+        if (!result) {
+            return res.status(404).json({ error: "앱을 찾을 수 없습니다" });
+        }
+        
+        res.json({ result, reviews });
+    } catch (error) {
+        console.log("못찾음")
+        res.status(500).json({ error: "Failed to fetch data" });
+    }
 });
+
+// 리뷰 제출 라우트
+app.use('/api/reviews', reviewRouter);
 
 // 404 에러 처리
 app.use((req, res, next) => {
@@ -48,6 +91,10 @@ app.use((err, req, res, next) => {
 });
 
 // 서버 시작
-app.listen(port, () => {
-    console.log(`서버가 http://localhost:${port} 에서 실행 중입니다`);
-});
+initializeDB().then(() => {
+    app.listen(port, () => {
+      console.log('http://localhost:8080 에서 서버 실행중')
+    })
+  }).catch(err => {
+    console.error('DB 초기화 실패:', err)
+  });

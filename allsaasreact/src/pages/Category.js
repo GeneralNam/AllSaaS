@@ -1,34 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import CategoryBox from './CategoryBox';
 
 const Category = () => {
-  const [categories, setCategories] = useState([
-    { id: 1 },
-    { id: 2 }
-  ]);
+ const [siteData, setSiteData] = useState([]);
+ const [reviews, setReviews] = useState([]);
 
-  const addCategory = () => {
-    const newCategory = {
-      id: categories.length + 1
-    };
-    setCategories([...categories, newCategory]);
-  };
+ useEffect(() => {
+   const fetchSites = async () => {
+     try {
+       const response = await fetch('http://localhost:8080/api/sites');
+       const {sites, reviews} = await response.json();
+       setSiteData(sites);
+       setReviews(reviews);
+     } catch (error) {
+       console.error('Error:', error);
+       setSiteData([]);
+       setReviews([]);
+     }
+   };
 
-  return (
-    <div className="px-6 py-6 max-w-[1000px] mx-auto">
-      <button 
-        onClick={addCategory}
-        className="px-4 py-2 bg-white border border-gray-200 rounded hover:bg-gray-50 text-sm mb-6 transition-all duration-200"
-      >
-        + 카테고리 추가
-      </button>
-      <div className="grid grid-cols-1 gap-20">
-        {categories.map((category) => (
-          <CategoryBox key={category.id} site={category} />
-        ))}
-      </div>
-    </div>
-  );
+   fetchSites();
+ }, []);
+
+ return (
+   <div className="category-page max-w-[1200px] mx-auto px-6">
+     <div className="breadcrumb py-8 text-sm">
+       <span className="text-gray-600">카테고리 &gt; 생산성 및 시간관리</span>
+     </div>
+     
+     <div className="category-grid space-y-16">
+       {siteData && siteData.length > 0 ? (
+         siteData.map((site, index) => {
+           const siteReviews = reviews.filter(review => review.name === site.name);
+           
+           return (
+             <CategoryBox 
+               key={index}
+               siteData={site}
+               reviews={siteReviews}
+             />
+           );
+         })
+       ) : (
+         <div className="text-center py-8">데이터를 불러오는 중...</div>
+       )}
+     </div>
+   </div>
+ );
 };
 
 export default Category;
