@@ -9,7 +9,8 @@ const CategoryBox = ({ siteData, reviews = [] }) => {
 
  return (
    <Link to={`/appinfo/${siteData.name}`} className="category-box-link block">
-     <div className="category-box grid grid-cols-2 bg-white border border-gray-200 rounded-lg p-8 gap-12 min-h-[600px]">
+     <div className="category-box grid grid-cols-2 bg-white border border-gray-200 p-8 gap-12 min-h-[600px]"
+     style={{ borderRadius: '50px' }}>
        {/* 왼쪽 섹션 */}
        <div className="category-content-left flex flex-col gap-0">
          {/* 로고와 이름 */}
@@ -52,7 +53,7 @@ const CategoryBox = ({ siteData, reviews = [] }) => {
              videoId={siteData.videoId}
              opts={{
                width: '100%',
-               height: '300',
+               height: '290',
                playerVars: {
                  autoplay: 0,
                },

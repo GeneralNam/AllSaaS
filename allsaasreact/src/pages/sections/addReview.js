@@ -34,7 +34,7 @@ const Review = ({ appData, name }) => {
     }
 
     try {
-      const response = await fetch(`http://localhost:8080/api/reviews/${name}`, {
+      const response = await fetch(`/api/reviews/${name}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

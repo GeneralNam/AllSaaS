@@ -6,6 +6,7 @@ import AppInfo from './pages/AppInfo';
 import AddSaasForm from './pages/AddSaasForm';
 import Main from './pages/Main';
 import Navbar from './Navbar';
+import MyPage from './pages/sections/MyPage';
 
 // 페이지 컴포넌트들
 // const Home = () => {
@@ -28,14 +29,14 @@ const Collaboration = () => {
   return <h1>협업</h1>;
 };
 
-const MyPage = () => {
-  return <h1>마이페이지</h1>;
-};
 
 function App() {
   return (
     <BrowserRouter>
-      <div className="App">
+      <div className="App" style={{ 
+        backgroundColor: '#f3f3f1',
+        minHeight: '100vh'
+      }}>
         <Navbar />
         <div className="pt-16"> {/* Navbar 높이만큼 패딩 추가 */}
           <Routes>

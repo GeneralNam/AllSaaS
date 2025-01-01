@@ -150,7 +150,7 @@ const AppInfo = () => {
                 <div className="flex items-center gap-4 mb-2">
                   <div className="w-10 h-10 bg-gray-200 rounded-full" />
                   <div>
-                    <h3 className="font-semibold">{review.name}</h3>
+                    <h3 className="font-semibold">{review.nickname}</h3>
                     <p className="text-sm text-gray-500">
                       {new Date(review.createdAt).toLocaleDateString()}
                     </p>
