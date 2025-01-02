@@ -1,20 +1,15 @@
 import React, { useState } from 'react';
-import { Upload } from 'lucide-react';
+import { Upload, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const AddSaasForm = () => {
   const navigate = useNavigate();
 
-
   const [formData, setFormData] = useState({
-    name: '',
     siteUrl: '',
-    info: '',
-    youtubeUrl: '',
-    description: ''
+    userDescription: ''
   });
-  const [logo, setLogo] = useState(null);
-  const [pictures, setPictures] = useState([]);
+  const [photos, setPhotos] = useState([]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -24,23 +19,17 @@ const AddSaasForm = () => {
     }));
   };
 
-  const handleLogoUpload = (e) => {
-    if (e.target.files[0]) {
-      setLogo(e.target.files[0]);
-    }
-  };
-
-  const handlePictureUpload = (e) => {
+  const handlePhotoUpload = (e) => {
     const files = Array.from(e.target.files);
-    if (files.length + pictures.length <= 3) {
-      setPictures(prev => [...prev, ...files]);
+    if (files.length + photos.length <= 3) {
+      setPhotos(prev => [...prev, ...files]);
     } else {
       alert('최대 3개의 사진만 업로드할 수 있습니다.');
     }
   };
 
-  const handleRemovePicture = (index) => {
-    setPictures(prev => prev.filter((_, i) => i !== index));
+  const handleRemovePhoto = (index) => {
+    setPhotos(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e) => {
@@ -48,19 +37,14 @@ const AddSaasForm = () => {
     
     const formDataToSend = new FormData();
     
-    // 기본 데이터 추가
+    // Add basic data
     Object.keys(formData).forEach(key => {
       formDataToSend.append(key, formData[key]);
     });
     
-    // 로고 추가
-    if (logo) {
-      formDataToSend.append('logo', logo);
-    }
-    
-    // 사진들 추가
-    pictures.forEach(pic => {
-      formDataToSend.append('pictures', pic);
+    // Add photos
+    photos.forEach((photo, index) => {
+      formDataToSend.append('userPhotos', photo);
     });
   
     try {
@@ -73,11 +57,8 @@ const AddSaasForm = () => {
         throw new Error('서버 에러');
       }
   
-      const data = await response.json();
       alert('성공적으로 추가되었습니다!');
-      // 성공 후 다른 페이지로 이동
-      navigate('/category');  // 이동하고 싶은 경로
-      // 폼 초기화나 리다이렉트 등 추가 처리
+      navigate('/');
       
     } catch (error) {
       console.error('Error:', error);
@@ -86,122 +67,70 @@ const AddSaasForm = () => {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto bg-white rounded-lg shadow">
-      <div className="p-6 border-b">
-        <h2 className="text-xl font-semibold">새로운 SaaS 추가</h2>
-      </div>
+    <div className="max-w-2xl mx-auto py-8">
+      <h1 className="text-2xl font-bold mb-8 text-left">SaaS 추가</h1>
       
-      <div className="p-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* 기본 정보 */}
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">서비스 이름</label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleInputChange}
-                className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">사이트 URL</label>
-              <input
-                type="url"
-                name="siteUrl"
-                value={formData.siteUrl}
-                onChange={handleInputChange}
-                className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">서비스 소개</label>
-              <textarea
-                name="info"
-                value={formData.info}
-                onChange={handleInputChange}
-                className="w-full p-2 border rounded-md h-24 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">YouTube URL</label>
-              <input
-                type="url"
-                name="youtubeUrl"
-                value={formData.youtubeUrl}
-                onChange={handleInputChange}
-                className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">상세 설명</label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                className="w-full p-2 border rounded-md h-32 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
+      <div className="bg-white rounded-3xl shadow-lg p-8">
+        <form onSubmit={handleSubmit} className="space-y-8">
+          {/* Landing Page Link */}
+          <div>
+            <label className="block text-base mb-2">메인페이지 링크</label>
+            <input
+              type="url"
+              name="siteUrl"
+              value={formData.siteUrl}
+              onChange={handleInputChange}
+              className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
           </div>
 
-          {/* 로고 업로드 */}
+          {/* Description */}
           <div>
-            <label className="block text-sm font-medium mb-2">로고 이미지</label>
-            <div className="border-2 border-dashed rounded-lg p-4 text-center">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleLogoUpload}
-                className="hidden"
-                id="logo-upload"
-              />
-              <label htmlFor="logo-upload" className="cursor-pointer">
-                <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                <span className="mt-2 block text-sm text-gray-600">
-                  {logo ? logo.name : '로고 이미지를 선택하세요'}
-                </span>
-              </label>
-            </div>
+            <label className="block text-base mb-2">추가하고싶은 설명</label>
+            <textarea
+              name="userDescription"
+              value={formData.userDescription}
+              onChange={handleInputChange}
+              className="w-full p-3 border border-gray-300 rounded-xl h-32 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
           </div>
 
-          {/* 사진 업로드 */}
+          {/* Photo Upload */}
           <div>
-            <label className="block text-sm font-medium mb-2">서비스 사진 (최대 3개)</label>
-            <div className="border-2 border-dashed rounded-lg p-4">
+            <label className="block text-base mb-2">추가하고싶은 사진 (최대 3개)</label>
+            <div className="border-2 border-dashed border-gray-300 rounded-xl p-8">
               <input
                 type="file"
                 accept="image/*"
                 multiple
-                onChange={handlePictureUpload}
+                onChange={handlePhotoUpload}
                 className="hidden"
-                id="pictures-upload"
+                id="photo-upload"
               />
-              <label htmlFor="pictures-upload" className="cursor-pointer block text-center">
-                <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                <span className="mt-2 block text-sm text-gray-600">
-                  사진을 선택하세요 ({pictures.length}/3)
+              <label 
+                htmlFor="photo-upload" 
+                className="cursor-pointer flex flex-col items-center"
+              >
+                <Upload className="h-12 w-12 text-gray-400 mb-2" />
+                <span className="text-gray-600">
+                  사진을 선택하세요 ({photos.length}/3)
                 </span>
               </label>
-              {pictures.length > 0 && (
+
+              {/* Selected Photos Preview */}
+              {photos.length > 0 && (
                 <div className="mt-4 space-y-2">
-                  {pictures.map((pic, index) => (
-                    <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                      <span className="text-sm">{pic.name}</span>
+                  {photos.map((photo, index) => (
+                    <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                      <span className="text-sm truncate">{photo.name}</span>
                       <button
                         type="button"
-                        onClick={() => handleRemovePicture(index)}
-                        className="text-red-500 text-sm hover:text-red-600"
+                        onClick={() => handleRemovePhoto(index)}
+                        className="text-gray-500 hover:text-red-500"
                       >
-                        삭제
+                        <X size={16} />
                       </button>
                     </div>
                   ))}
@@ -210,12 +139,12 @@ const AddSaasForm = () => {
             </div>
           </div>
 
-          {/* 제출 버튼 */}
+          {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors"
+            className="w-full bg-black text-white py-3 rounded-xl hover:bg-gray-900 hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
           >
-            SaaS 추가하기
+            추가하기
           </button>
         </form>
       </div>

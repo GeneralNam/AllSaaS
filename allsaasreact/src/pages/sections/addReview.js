@@ -64,7 +64,7 @@ const Review = ({ appData, name }) => {
   return (
     <section className="mb-8">
       {/* 리뷰 작성 폼 */}
-      <div className="bg-gray-50 p-6 rounded-lg mt-6">
+      <div className="bg-white p-6 rounded-3xl shadow-lg mt-6">
         <h3 className="text-lg font-semibold mb-4">리뷰 작성</h3>
         <form className="space-y-4" onSubmit={handleSubmit}>
           {/* 별점 선택 UI */}
@@ -135,7 +135,7 @@ const Review = ({ appData, name }) => {
           </div>
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600"
+            className="w-full bg-black text-white py-2 rounded-lg hover:bg-gray-700 hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
           >
             게시
           </button>

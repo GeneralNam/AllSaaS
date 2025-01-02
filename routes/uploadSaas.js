@@ -20,13 +20,12 @@ const upload = multer({
     s3: s3,
     bucket: 'jhnamforum1',
     key: function (req, file, cb) {
-      const folder = file.fieldname === 'logo' ? 'logos' : 'pictures';
-      cb(null, `${folder}/${Date.now()}-${file.originalname}`);
+      cb(null, `userPhotos/${Date.now()}-${file.originalname}`);
     },
     contentType: multerS3.AUTO_CONTENT_TYPE
   }),
   limits: {
-    fileSize: 5 * 1024 * 1024
+    fileSize: 5 * 1024 * 1024 // 5MB 제한
   },
   fileFilter: (req, file, cb) => {
     if (!file.mimetype.startsWith('image/')) {
@@ -36,29 +35,18 @@ const upload = multer({
   }
 });
 
-// AddSaasForm에서 받은 데이터를 db에 저장하는 라우트
-router.post('/', upload.fields([
-  { name: 'logo', maxCount: 1 },
-  { name: 'pictures', maxCount: 3 }
-]), async (req, res) => {
+// 여러 장의 사진을 처리하는 라우트
+router.post('/', upload.array('userPhotos', 3), async (req, res) => {
   try {
-    const { name, siteUrl, info, youtubeUrl, description } = req.body;
-
-    // YouTube URL에서 videoId 추출
-    const videoId = extractVideoId(youtubeUrl);
-    const logoUrl = req.files.logo ? req.files.logo[0].location : null;
-    const pictureUrls = req.files.pictures ? req.files.pictures.map(file => file.location) : [];
+    const { siteUrl, userDescription } = req.body;
+    
+    // 업로드된 파일들의 URL을 배열로 저장
+    const photoUrls = req.files ? req.files.map(file => file.location) : [];
 
     const saasData = {
-      name,
       siteUrl,
-      info,
-      videoId,
-      description,
-      logo: logoUrl,
-      pictures: pictureUrls,
-      averageRating: 0,
-      ratingCount: 0,
+      userDescription,
+      photoUrls, // 여러 장의 사진 URL을 배열로 저장
       createdAt: new Date()
     };
 
@@ -80,12 +68,5 @@ router.post('/', upload.fields([
     });
   }
 });
-
-// YouTube URL에서 videoId 추출 함수
-const extractVideoId = (youtubeUrl) => {
-  const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([\w-]{11})/;
-  const match = youtubeUrl.match(regex);
-  return match ? match[1] : null; // 매칭되면 videoId 반환, 없으면 null
-};
 
 module.exports = router;

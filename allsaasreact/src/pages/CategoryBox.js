@@ -58,6 +58,7 @@ const CategoryBox = ({ siteData, reviews = [] }) => {
                  autoplay: 0,
                },
              }}
+             className="rounded-3xl overflow-hidden"
            />
          </div>
          
