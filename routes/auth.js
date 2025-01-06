@@ -68,6 +68,24 @@ router.get('/oauth2/redirect/google', passport.authenticate('google'), (req, res
   res.redirect('http://localhost:3000');  // React 앱으로 리다이렉트
 });
 
+// 로그인 상태 체크 API
+router.get('/check-auth', (req, res) => {
+    if (req.isAuthenticated()) {
+      // serialize에서 저장한 정보 그대로 보내기
+      const { id, name, nickname } = req.user;
+      return res.json({ 
+        user: { 
+          id,
+          name, 
+          nickname
+        } 
+      });
+    }
+    
+    // 로그인 안된 상태
+    res.status(401).json({ message: "Not authenticated" });
+  });
+
 router.post('/logout', function(req, res, next) {
    req.logout(function(err) {
        if (err) { return next(err); }

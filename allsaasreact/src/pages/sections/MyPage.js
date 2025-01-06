@@ -1,26 +1,35 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const MyPage = () => {
   const [currentNickname, setCurrentNickname] = useState('');
   const [newNickname, setNewNickname] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchNickname = async () => {
+    const checkAuthStatus = async () => {
       try {
-        const response = await fetch('/api/user/nickname');
+        const response = await fetch('/api/auth/status', {
+          credentials: 'include'
+        });
         const data = await response.json();
-        if (data.nickname) {
-          setCurrentNickname(data.nickname);
+        
+        if (!data.isAuthenticated) {
+          navigate('/');
+          return;
         }
+        
+        setCurrentNickname(data.nickname);
       } catch (error) {
-        console.error('닉네임 가져오기 실패:', error);
+        console.error('인증 상태 확인 실패:', error);
+        navigate('/');
       }
     };
 
-    fetchNickname();
-  }, []);
+    checkAuthStatus();
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

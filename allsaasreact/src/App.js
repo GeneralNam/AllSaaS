@@ -1,56 +1,79 @@
-// App.js
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import './App.css';
 import Category from './pages/Category';
 import AppInfo from './pages/AppInfo';
-import AddSaasForm from './pages/AddSaasForm';
+import AddSaasForm from './pages/suggestion/AddSaasForm';
 import Main from './pages/Main';
 import Navbar from './Navbar';
 import MyPage from './pages/sections/MyPage';
+import { AuthContext } from './pages/context/AuthContext';
+import { useState, useEffect, useContext } from 'react';
+import axios from 'axios';
+import ReactGA from 'react-ga4';
+import Suggestion from './pages/Suggestion';
 
-// 페이지 컴포넌트들
-// const Home = () => {
-//   return <h1>카테고리</h1>;
-// };
 
-// const AddSite = () => {
-//   return <h1>사이트 추가</h1>;
-// };
 
-// const Collaboration = () => {
-//   return <h1>협업</h1>;
-// };
+// 새로운 컴포넌트 - BrowserRouter 안에서 useLocation 사용
+function AppContent() {
+  const location = useLocation();
+  const { user } = useContext(AuthContext);
 
-// const MyPage = () => {
-//   return <h1>마이페이지</h1>;
-// };
+  useEffect(() => {
+    console.log('location.pathname', location.pathname);
+    ReactGA.send({ hitType: "pageview", page: location.pathname });
+  }, [location]);
 
-const Collaboration = () => {
-  return <h1>협업</h1>;
-};
-
+  return (
+    <div className="App" style={{
+      backgroundColor: '#f3f3f1',
+      minHeight: '100vh'
+    }}>
+      <Navbar />
+      <div className="pt-16">
+        <Routes>
+          <Route path="/" element={<Main />} />
+          <Route path="/categories" element={<Category />} />
+          <Route path="/appinfo/:name" element={<AppInfo />} />
+          <Route path="/suggestion" element={<Suggestion />} />
+          <Route path="/mypage" element={user ? <MyPage /> : <Navigate to="/" />} />
+          <Route path="*" element={<h1>페이지를 찾을 수 없습니다.</h1>} />
+        </Routes>
+      </div>
+    </div>
+  );
+}
 
 function App() {
+  const [user, setUser] = useState(null);
+
+  // 페이지 로드될 때 로그인 상태 체크
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      try {
+        const response = await axios.get('/check-auth');
+        setUser(response.data.user);
+      } catch (error) {
+        setUser(null);
+      }
+    };
+
+    checkLoginStatus();
+  }, []);
+
+  // GA4 초기화
+  useEffect(() => {
+    console.log('GA4 초기화');
+    ReactGA.initialize('G-YETZMH3GLE', {debug_mode: true});
+    console.log('GA4 초기화 완료');
+  }, []);
+
   return (
-    <BrowserRouter>
-      <div className="App" style={{ 
-        backgroundColor: '#f3f3f1',
-        minHeight: '100vh'
-      }}>
-        <Navbar />
-        <div className="pt-16"> {/* Navbar 높이만큼 패딩 추가 */}
-          <Routes>
-            <Route path="/" element={<Main />} />
-            <Route path="/categories" element={<Category />} />
-            <Route path="/appinfo/:name" element={<AppInfo />} />
-            <Route path="/add-site" element={<AddSaasForm />} />
-            <Route path="/collaboration" element={<Collaboration />} />
-            <Route path="/mypage" element={<MyPage />} />
-            <Route path="*" element={<h1>페이지를 찾을 수 없습니다.</h1>} />
-          </Routes>
-        </div>
-      </div>
-    </BrowserRouter>
+    <AuthContext.Provider value={{ user, setUser }}>
+      <BrowserRouter>
+        <AppContent />
+      </BrowserRouter>
+    </AuthContext.Provider>
   );
 }
 

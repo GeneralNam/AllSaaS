@@ -68,7 +68,7 @@ const AddSaasForm = () => {
 
   return (
     <div className="max-w-2xl mx-auto py-8">
-      <h1 className="text-2xl font-bold mb-8 text-left">SaaS 추가</h1>
+      
       
       <div className="bg-white rounded-3xl shadow-lg p-8">
         <form onSubmit={handleSubmit} className="space-y-8">

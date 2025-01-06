@@ -17,7 +17,7 @@ var passport = require('passport');
 // 미들웨어 설정
 app.use(cors({
     origin: 'http://localhost:3000',  // React 앱의 주소
-    credentials: true  // 쿠키 전달을 위해 필요
+    credentials: true  // 쿠키 전달을 위해 필요<Route path="/mypage" element={user ? <MyPage /> : <Navigate to="/" />} />
 }));
 app.use(express.json()); // JSON 파싱
 app.use(express.urlencoded({ extended: true })); // URL 인코딩된 데이터 파싱
@@ -58,11 +58,6 @@ function isAuthenticated(req, res, next) {
         res.status(401).json({ error: "로그인이 필요합니다" });
     }
 }
-
-// 원래닉네임 보내기
-app.get('/api/user/nickname', isAuthenticated, (req, res) => {
-    res.json({ nickname: req.user.nickname });
-});
 
 // 닉네임 바꾸기
 app.post('/change-nickname', isAuthenticated, async (req, res) => {

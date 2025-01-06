@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useContext} from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from './pages/context/AuthContext';
 
 const Navbar = () => {
+  const navigate = useNavigate(); 
   const [isHovered, setIsHovered] = useState(false);
   const [hoveredSection, setHoveredSection] = useState(null);
   const [visible, setVisible] = useState(true);
@@ -131,21 +133,15 @@ const Navbar = () => {
  
               {/* 다른 NavItem들 */}
               <NavItem
-                to="/add-site"
-                label="사이트추가"
+                to="/suggestion"
+                label="제안"
                 hoveredSection={hoveredSection}
                 setHoveredSection={setHoveredSection}
                 setIsHovered={setIsHovered}
                 noHoverEffect={true}
               />
-              <NavItem
-                to="/collaboration"
-                label="협업"
-                hoveredSection={hoveredSection}
-                setHoveredSection={setHoveredSection}
-                setIsHovered={setIsHovered}
-                noHoverEffect={true}
-              />
+
+              {authStatus.isAuthenticated && (
               <NavItem
                 to="/mypage"
                 label="마이페이지"
@@ -154,6 +150,7 @@ const Navbar = () => {
                 setIsHovered={setIsHovered}
                 noHoverEffect={true}
               />
+            )}
             </div>
  
             {/* 우측 로그인/로그아웃 */}
@@ -172,6 +169,7 @@ const Navbar = () => {
                         isAuthenticated: false,
                         nickname: null
                       });
+                      navigate('/'); 
                     }
                   } catch (error) {
                     console.error('로그아웃 실패:', error);
