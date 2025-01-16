@@ -21,7 +21,7 @@ const UserInquiry = () => {
     e.preventDefault();
     
     try {
-      const response = await fetch('http://localhost:8080/inquiry', {
+      const response = await fetch('/suggestion/inquiry', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

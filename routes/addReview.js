@@ -1,7 +1,7 @@
 // routes/review.js
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const initializeDB = require("./db.js");
+import initializeDB from './db.js';
 
 // db 파라미터 필요
 async function addRating(db, appName, rating) {
@@ -73,4 +73,4 @@ router.post('/:name', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

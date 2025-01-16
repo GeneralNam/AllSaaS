@@ -1,11 +1,10 @@
-const {MongoClient} = require('mongodb');
-require('dotenv').config();
+import { MongoClient } from 'mongodb';
+import dotenv from 'dotenv';
 
+dotenv.config();
 
 const connectionString = process.env.MONGODB_URI;
 const client = new MongoClient(connectionString);
-
-  
 
 let db; // 데이터베이스 객체를 저장할 변수
 
@@ -23,4 +22,4 @@ async function initializeDB() {
   return db;
 }
 
-module.exports = initializeDB ;// initializeDB를 호출하면 데이터베이스 객체를 반환
+export default initializeDB;

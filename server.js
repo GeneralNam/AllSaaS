@@ -1,30 +1,32 @@
-const express = require('express');
-require('dotenv').config();
+import express from 'express';
+import dotenv from 'dotenv';
+import cors from 'cors';
+import morgan from 'morgan';
+import session from 'express-session';
+import passport from 'passport';
+import connectMongoDBSession from 'connect-mongodb-session';
+import initializeDB from "./routes/db.js";
+import saasRouter from './routes/uploadSaas.js';
+import reviewRouter from './routes/addReview.js';
+import crawler from './routes/crawler.js';
+import adminRouter from './routes/admin.js';
+import authRouter from './routes/auth.js';
+import userEditRouter from './routes/userEdit.js';
+import userInquiryRouter from './routes/userInquiry.js';    
+
+dotenv.config();
 const app = express();
 const port = 8080;
-const cors = require('cors');
-const initializeDB = require("./routes/db.js");
-const saasRouter = require('./routes/uploadSaas')
-const reviewRouter = require('./routes/addReview.js');
-const crawler = require('./routes/crawler.js');
-var authRouter = require('./routes/auth');
-var logger = require('morgan');
-var session = require('express-session');
-const MongoDBStore = require('connect-mongodb-session')(session);
-var passport = require('passport');
-
+const MongoDBStore = connectMongoDBSession(session);
 
 // 미들웨어 설정
 app.use(cors({
-    origin: 'http://localhost:3000',  // React 앱의 주소
-    credentials: true  // 쿠키 전달을 위해 필요<Route path="/mypage" element={user ? <MyPage /> : <Navigate to="/" />} />
+    origin: 'http://localhost:3000',
+    credentials: true
 }));
-app.use(express.json()); // JSON 파싱
-app.use(express.urlencoded({ extended: true })); // URL 인코딩된 데이터 파싱
-
-// 정적 파일 제공
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
-
 
 // 세션 설정
 app.use(session({
@@ -37,9 +39,9 @@ app.use(session({
         collection: 'sessions'
     }),
     cookie: {
-        maxAge: 1000 * 60 * 60 * 24,  // 24시간
-        sameSite: 'lax',  // CSRF 보호
-        secure: false,  // 개발환경에서는 false, 프로덕션에서는 true
+        maxAge: 1000 * 60 * 60 * 24,
+        sameSite: 'lax',
+        secure: false,
     }
 }));
 
@@ -47,17 +49,16 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-
 app.use('/', authRouter);
 
 // 사용자 인증 미들웨어
-function isAuthenticated(req, res, next) {
-    if (req.user) {  // 또는 req.isAuthenticated()
+const isAuthenticated = (req, res, next) => {
+    if (req.user) {
         next();
     } else {
         res.status(401).json({ error: "로그인이 필요합니다" });
     }
-}
+};
 
 // 닉네임 바꾸기
 app.post('/change-nickname', isAuthenticated, async (req, res) => {
@@ -65,16 +66,13 @@ app.post('/change-nickname', isAuthenticated, async (req, res) => {
         const newNickname = req.body.nickname;
         const db = await initializeDB();
         
-        // users 컬렉션의 닉네임 업데이트
         await db.collection('users').updateOne(
             { _id: req.user.id },
             { $set: { nickname: newNickname } }
         );
  
-        // 세션의 사용자 정보 업데이트
         req.session.passport.user.nickname = newNickname;
         
-        // 세션 저장
         req.session.save((err) => {
             if (err) {
                 return res.status(500).json({ error: "세션 업데이트 실패" });
@@ -84,14 +82,12 @@ app.post('/change-nickname', isAuthenticated, async (req, res) => {
                 nickname: newNickname 
             });
         });
- 
     } catch (error) {
         console.error('닉네임 변경 오류:', error);
         res.status(500).json({ error: "닉네임 변경 실패" });
     }
- });
+});
 
-// 로그인 상태 확인 API
 app.get('/api/auth/status', (req, res) => {
     if (req.isAuthenticated()) {
         res.json({
@@ -106,32 +102,30 @@ app.get('/api/auth/status', (req, res) => {
     }
 });
 
+// 사이트 업로드 라우트
+app.use('/suggestion', saasRouter);
 
-// 이미지처리 라우트
-app.use('/addsaas', saasRouter);
+// 사이트 편집 라우트
+app.use('/suggestion', userEditRouter);
 
-// 로고찾기 라우트
+// 사이트 문의 라우트
+app.use('/suggestion/', userInquiryRouter);
+
+// 크롤링 라우트
 app.use('/api', crawler);
 
-
-// Category에서 categorybox 안에 내용채우기
 app.get('/api/sites', async (req, res) => {
     try {
         const db = await initializeDB();
         const sites = await db.collection('appinfo').find().toArray(); 
         const reviews = await db.collection('reviews').find().toArray(); 
-        console.log(reviews[0])
         res.json({ sites, reviews });
-        
-        
-      
     } catch (error) {
         console.error('Error fetching app data:', error);
         res.status(500).json({ message: "서버 에러가 발생했습니다" });
     }
 });
 
-// appinfo 안에 내용들 get요청 처리
 app.get('/appinfo/:name', async (req, res) => {
     try {
         const db = await initializeDB();
@@ -139,7 +133,7 @@ app.get('/appinfo/:name', async (req, res) => {
         if (!result) return res.status(404).json({ error: "앱을 찾을 수 없습니다" });
 
         const reviews = await db.collection('reviews').find({ name: req.params.name }).toArray();
-        const users = await db.collection('users').find().toArray();  // 유저 정보 가져오기
+        const users = await db.collection('users').find().toArray();
 
         reviews.forEach(review => {
             const user = users.find(u => u._id.toString() === review.authorId);
@@ -152,11 +146,11 @@ app.get('/appinfo/:name', async (req, res) => {
     }
 });
 
-// 리뷰 제출 라우트
+// 리뷰 라우트
 app.use('/api/reviews', reviewRouter);
 
-
-
+// 관리자 페이지 라우트
+app.use('/admin', adminRouter);
 
 // 404 에러 처리
 app.use((req, res, next) => {
@@ -174,6 +168,6 @@ initializeDB().then(() => {
     app.listen(port, () => {
       console.log('http://localhost:8080 에서 서버 실행중')
     })
-  }).catch(err => {
+}).catch(err => {
     console.error('DB 초기화 실패:', err)
-  });
+});

@@ -27,5 +27,6 @@
     "passport-google-oidc": "^0.1.0",
     "playwright": "^1.49.1",
     "react-ga4": "^2.1.0"
-  }
+  },
+  "type": "module"
 }

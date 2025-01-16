@@ -1,8 +1,9 @@
-var express = require('express');
-var passport = require('passport');
-var GoogleStrategy = require('passport-google-oauth20').Strategy;
-var router = express.Router();
-const initializeDB = require('./db');
+import express from 'express';
+import passport from 'passport';
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+import initializeDB from './db.js';
+
+const router = express.Router();
 
 passport.use(new GoogleStrategy({
    clientID: process.env['GOOGLE_CLIENT_ID'],
@@ -13,7 +14,6 @@ passport.use(new GoogleStrategy({
    try {
        const db = await initializeDB();
        
-       // federated_credentials에서 찾기
        const cred = await db.collection('federated_credentials').findOne({
            provider: 'google',
            subject: profile.id
@@ -28,7 +28,6 @@ passport.use(new GoogleStrategy({
            
            const id = result.insertedId;
            
-           // 인증정보 생성
            await db.collection('federated_credentials').insertOne({
                user_id: id,
                provider: 'google',
@@ -42,7 +41,7 @@ passport.use(new GoogleStrategy({
            };
            return done(null, user);
        }
-;       
+       
        // 기존 사용자 찾기
        const user = await db.collection('users').findOne({ _id: cred.user_id });
        if (!user) {
@@ -50,7 +49,6 @@ passport.use(new GoogleStrategy({
        }
 
        user.id = user._id.toString();
-
        return done(null, user);
        
    } catch (err) {
@@ -65,13 +63,11 @@ router.get('/login', function(req, res, next) {
 });
 
 router.get('/oauth2/redirect/google', passport.authenticate('google'), (req, res) => {
-  res.redirect('http://localhost:3000');  // React 앱으로 리다이렉트
+  res.redirect('http://localhost:3000');
 });
 
-// 로그인 상태 체크 API
 router.get('/check-auth', (req, res) => {
     if (req.isAuthenticated()) {
-      // serialize에서 저장한 정보 그대로 보내기
       const { id, name, nickname } = req.user;
       return res.json({ 
         user: { 
@@ -82,9 +78,8 @@ router.get('/check-auth', (req, res) => {
       });
     }
     
-    // 로그인 안된 상태
     res.status(401).json({ message: "Not authenticated" });
-  });
+});
 
 router.post('/logout', function(req, res, next) {
    req.logout(function(err) {
@@ -94,7 +89,6 @@ router.post('/logout', function(req, res, next) {
 });
 
 passport.serializeUser(function(user, cb) {
-
    process.nextTick(function() {
        cb(null, { 
            id: user.id,
@@ -105,10 +99,9 @@ passport.serializeUser(function(user, cb) {
 });
 
 passport.deserializeUser(function(user, cb) {
-
    process.nextTick(function() {
        return cb(null, user);
    });
 });
 
-module.exports = router;
+export default router;

@@ -11,6 +11,7 @@ import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import ReactGA from 'react-ga4';
 import Suggestion from './pages/Suggestion';
+import AdminPage from './pages/sections/AdminPage';
 
 
 
@@ -37,6 +38,7 @@ function AppContent() {
           <Route path="/appinfo/:name" element={<AppInfo />} />
           <Route path="/suggestion" element={<Suggestion />} />
           <Route path="/mypage" element={user ? <MyPage /> : <Navigate to="/" />} />
+          <Route path="/admin" element={<AdminPage />} />
           <Route path="*" element={<h1>페이지를 찾을 수 없습니다.</h1>} />
         </Routes>
       </div>

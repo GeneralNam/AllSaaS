@@ -48,7 +48,7 @@ const AddSaasForm = () => {
     });
   
     try {
-      const response = await fetch('http://localhost:8080/addsaas', {
+      const response = await fetch('/suggestion/site', {
         method: 'POST',
         body: formDataToSend
       });

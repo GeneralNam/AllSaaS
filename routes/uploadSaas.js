@@ -1,9 +1,9 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const { S3Client } = require('@aws-sdk/client-s3');
-const multer = require('multer');
-const multerS3 = require('multer-s3');
-const initializeDB = require("./db.js");
+import { S3Client } from '@aws-sdk/client-s3';
+import multer from 'multer';
+import multerS3 from 'multer-s3';
+import initializeDB from './db.js';
 
 // S3 클라이언트 설정
 const s3 = new S3Client({
@@ -36,22 +36,31 @@ const upload = multer({
 });
 
 // 여러 장의 사진을 처리하는 라우트
-router.post('/', upload.array('userPhotos', 3), async (req, res) => {
+router.post('/site', upload.array('userPhotos', 3), async (req, res) => {
+
+  const STATUS = {
+    PENDING: 0,    // 검토미완료
+    APPROVED: 1,   // 검토완료
+  }
   try {
     const { siteUrl, userDescription } = req.body;
+    const userId = req.user.id;
     
     // 업로드된 파일들의 URL을 배열로 저장
     const photoUrls = req.files ? req.files.map(file => file.location) : [];
 
     const saasData = {
+      type: 'site',
       siteUrl,
       userDescription,
+      userId,
       photoUrls, // 여러 장의 사진 URL을 배열로 저장
+      status: STATUS.PENDING,
       createdAt: new Date()
     };
 
     const db = await initializeDB();
-    await db.collection('appinfo').insertOne(saasData);
+    await db.collection('suggestions').insertOne(saasData);
 
     res.status(201).json({
       success: true,
@@ -69,4 +78,4 @@ router.post('/', upload.array('userPhotos', 3), async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

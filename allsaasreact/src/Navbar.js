@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext} from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from './pages/context/AuthContext';
 
+
 const Navbar = () => {
   const navigate = useNavigate(); 
   const [isHovered, setIsHovered] = useState(false);
@@ -151,6 +152,15 @@ const Navbar = () => {
                 noHoverEffect={true}
               />
             )}
+
+              <NavItem
+                to="/admin"
+                label="관리자"
+                hoveredSection={hoveredSection}
+                setHoveredSection={setHoveredSection}
+                setIsHovered={setIsHovered}
+                noHoverEffect={true}
+              />
             </div>
  
             {/* 우측 로그인/로그아웃 */}

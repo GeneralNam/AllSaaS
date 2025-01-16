@@ -21,13 +21,14 @@ const UserEdit = () => {
     e.preventDefault();
     
     try {
-      const response = await fetch('http://localhost:8080/edit-suggestion', {
+      const response = await fetch('/suggestion/edit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData)
       });
+
 
       if (!response.ok) {
         throw new Error('서버 에러');
