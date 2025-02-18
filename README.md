@@ -12,17 +12,22 @@
 ---
 
 ## 2. SaaS 세부 페이지  
-<img src="https://github.com/user-attachments/assets/58cfce3a-fbc7-40eb-9825-7ae65cf1d8d9" width="500">
+<img src="https://github.com/user-attachments/assets/a50a6eaa-d2fd-4f69-9c24-b05a9038030c" width="500">
+
 
 - 각 **SaaS 서비스 정보를 소개**하는 페이지.
 - **서비스 로고, 바로가기, 별점 확인 가능**.
 - **개발사 정보 및 설명 표시**.
+- 
+<img src="https://github.com/user-attachments/assets/cedfc851-6aa7-4d3a-b35c-6be796bf0aad" width="500">
+
 - **리뷰 작성** 및 사람들이 남긴 리뷰 확인 가능.
 
 ---
 
 ## 3. 제안 페이지  
-<img src="https://github.com/user-attachments/assets/4bcd7343-6df1-4b93-bf7f-1f5082cdc41e" width="500">
+<img src="https://github.com/user-attachments/assets/a9e386c9-9a0d-46a5-b663-ba98686bf584" width="500">
+
 
 - **사이트 추가 제안** 가능.
 - **정보 수정 제안** 가능.
