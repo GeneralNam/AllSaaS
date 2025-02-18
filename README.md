@@ -18,7 +18,7 @@
 - 각 **SaaS 서비스 정보를 소개**하는 페이지.
 - **서비스 로고, 바로가기, 별점 확인 가능**.
 - **개발사 정보 및 설명 표시**.
-- 
+
 <img src="https://github.com/user-attachments/assets/cedfc851-6aa7-4d3a-b35c-6be796bf0aad" width="500">
 
 - **리뷰 작성** 및 사람들이 남긴 리뷰 확인 가능.
